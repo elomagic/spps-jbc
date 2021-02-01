@@ -110,7 +110,7 @@
                     </mapping>
                     <properties>
                         <owner>Carsten Rambow</owner>
-                        <email>hl7inspector.dev@elomagic.de</email>
+                        <email>spps.dev@elomagic.de</email>
                     </properties>
                     <includes>
                         <include>src/main/java/**</include>

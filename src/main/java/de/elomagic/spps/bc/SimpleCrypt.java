@@ -1,7 +1,7 @@
 /*
  * Simple Password Protection Solution with Bouncy Castle
  *
- * Copyright © 2021-present Carsten Rambow (hl7inspector.dev@elomagic.de)
+ * Copyright © 2021-present Carsten Rambow (spps.dev@elomagic.de)
  *
  * This file is part of Simple Password Protection Solution with Bouncy Castle.
  *
