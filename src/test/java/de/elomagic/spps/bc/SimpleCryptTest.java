@@ -35,11 +35,19 @@ class SimpleCryptTest {
         char[] decryptedChars = SimpleCrypt.decryptToChars(encrypted);
 
         Assertions.assertArrayEquals(chars, decryptedChars);
+
+        Assertions.assertNull(SimpleCrypt.encrypt((String)null));
+        Assertions.assertNull(SimpleCrypt.encrypt((byte[])null));
+        Assertions.assertNull(SimpleCrypt.decryptToString(null));
+        Assertions.assertNull(SimpleCrypt.decrypt(null));
     }
 
-    /**
-     * Test of isEncryptedValue method, of class SimpleCrypt.
-     */
+    @Test
+    void testMain() {
+        Assertions.assertDoesNotThrow(() -> SimpleCrypt.main(new String[] {"abcde"}));
+        Assertions.assertDoesNotThrow(() -> SimpleCrypt.main(null));
+    }
+
     @Test
     void testIsEncryptedValue() {
         Assertions.assertTrue(SimpleCrypt.isEncryptedValue("{abc}"));
