@@ -9,7 +9,7 @@
     <version>1.0.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>Simple Password Protection Solution</name>
+    <name>Simple Password Protection Solution with Bouncy Castle</name>
     <description>Simple Password Protection Solution for Java with Bouncy Castle</description>
 
     <licenses>

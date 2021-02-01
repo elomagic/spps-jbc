@@ -1,9 +1,9 @@
 /*
- * Simple Password Protection Solution
+ * Simple Password Protection Solution with Bouncy Castle
  *
  * Copyright © 2021-present Carsten Rambow (hl7inspector.dev@elomagic.de)
  *
- * This file is part of Simple Password Protection Solution.
+ * This file is part of Simple Password Protection Solution with Bouncy Castle.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
