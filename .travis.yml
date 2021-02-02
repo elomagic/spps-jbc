@@ -2,7 +2,7 @@ sudo: false
 language: java
 jdk:
   - openjdk8
-script: mvn clean test jacoco:report coveralls:report -Dcoverall-token=$coverall_token
+script: mvn clean test coveralls:report -Dcoverall-token=$coverall_token
 cache:
   directories:
     - $HOME/.m2
