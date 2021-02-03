@@ -20,6 +20,10 @@ class SimpleCryptTest {
         String decrypted = SimpleCrypt.decryptToString(encrypted);
 
         Assertions.assertEquals(value, decrypted);
+
+        String e1 = SimpleCrypt.encrypt(value);
+        String e2 = SimpleCrypt.encrypt(value);
+        Assertions.assertNotEquals(e1, e2);
     }
 
     @Test

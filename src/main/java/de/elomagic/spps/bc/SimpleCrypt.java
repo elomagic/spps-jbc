@@ -34,6 +34,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -42,6 +43,7 @@ import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.Collections;
 
 /**
@@ -52,24 +54,35 @@ public class SimpleCrypt {
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
     private static final Logger LOGGER = LogManager.getLogger(SimpleCrypt.class);
-    private static final Path MASTER_KEY_FILE = Paths.get(System.getProperty("user.home"), ".elomagic", "masterkey");
+    private static final Path MASTER_KEY_FILE = Paths.get(System.getProperty("user.home"), ".spps", "masterkey");
 
     private SimpleCrypt() {
+    }
+
+    /**
+     * Creates a new random initialization vector.
+     *
+     * @return Returns the initialization vector but never null
+     */
+    @NotNull
+    private static IvParameterSpec createInitializationVector() {
+        SecureRandom random = new SecureRandom();
+        byte[] iv = new byte[16];
+        random.nextBytes(iv);
+        return new IvParameterSpec(iv);
     }
 
     /**
      * Creates a cipher.
      *
      * @param opmode The operation mode of this cipher (this is one of the following: {@code ENCRYPT_MODE} or {@code DECRYPT_MODE}
+     * @param iv Initialization vector for first block
      * @return Returns cipher
      */
     @NotNull
-    private static Cipher createCypher(int opmode) throws GeneralSecurityException {
-        // BUG? IV Must random and must only 12 bytes long ???
-        byte[] iv = "0123456789abcdef".getBytes();
-
+    private static Cipher createCypher(int opmode, @NotNull IvParameterSpec iv) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION, new BouncyCastleProvider());
-        cipher.init(opmode, getMasterKey(), new IvParameterSpec(iv));
+        cipher.init(opmode, getMasterKey(), iv);
 
         return cipher;
     }
@@ -128,10 +141,15 @@ public class SimpleCrypt {
         }
 
         try {
-            Cipher cipher = createCypher(Cipher.ENCRYPT_MODE);
+            IvParameterSpec iv = createInitializationVector();
+            Cipher cipher = createCypher(Cipher.ENCRYPT_MODE, iv);
             byte[] encrypted = cipher.doFinal(decrypted);
 
-            return "{" + Base64.toBase64String(encrypted) + "}";
+            byte[] data = new byte[iv.getIV().length + encrypted.length];
+            System.arraycopy(iv.getIV(), 0, data, 0, iv.getIV().length);
+            System.arraycopy(encrypted, 0, data, iv.getIV().length, encrypted.length);
+
+            return "{" + Base64.toBase64String(data) + "}";
         } catch(Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
             throw new GeneralSecurityException(ex.getMessage(), ex);
@@ -182,8 +200,10 @@ public class SimpleCrypt {
         try {
             byte[] encryptedBytes = Base64.decode(encryptedBase64.substring(1, encryptedBase64.length() - 1));
 
-            Cipher cipher = createCypher(Cipher.DECRYPT_MODE);
-            return cipher.doFinal(encryptedBytes);
+            IvParameterSpec iv = new IvParameterSpec(encryptedBytes, 0, 16);
+
+            Cipher cipher = createCypher(Cipher.DECRYPT_MODE, iv);
+            return cipher.doFinal(encryptedBytes, 16, encryptedBytes.length-16);
         } catch(Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
             throw new GeneralSecurityException("Unable to decrypt data.", ex);
