@@ -156,7 +156,7 @@ public class SimpleCrypt {
     }
 
     /**
-     * Encrypt, encoded as Base64 and encapsulate with curly bracket of a string.
+     * Encrypt, encode as Base64 and encapsulate with curly bracket of a string.
      *
      * @param decrypted a non encrypted char array
      * @return Returns a encrypted, Base64 encoded string, surrounded with curly brackets.
@@ -168,7 +168,7 @@ public class SimpleCrypt {
     }
 
     /**
-     * Encrypt, encoded as Base64 and encapsulate with curly bracket of a string.
+     * Encrypt, encode as Base64 and encapsulate with curly bracket of a string.
      *
      * @param decrypted a non encrypted string
      * @return Returns a encrypted, Base64 encoded string, surrounded with curly brackets.

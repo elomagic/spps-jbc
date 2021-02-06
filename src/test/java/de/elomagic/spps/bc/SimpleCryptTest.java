@@ -57,12 +57,20 @@ class SimpleCryptTest {
     void testIsEncryptedValue() {
         Assertions.assertTrue(SimpleCrypt.isEncryptedValue("{abc}"));
         Assertions.assertFalse(SimpleCrypt.isEncryptedValue("abc}"));
+        Assertions.assertFalse(SimpleCrypt.isEncryptedValue("{abc"));
+        Assertions.assertFalse(SimpleCrypt.isEncryptedValue("abc"));
+        Assertions.assertFalse(SimpleCrypt.isEncryptedValue(null));
     }
 
     @Test
     void testDecrypt1() {
         Exception ex = Assertions.assertThrows(GeneralSecurityException.class, ()->SimpleCrypt.decrypt("this isn't a encapsulated value"));
         Assertions.assertTrue(ex.getMessage().contains("This value is not with curly brackets"));
+    }
+
+    @Test
+    void testFree() throws GeneralSecurityException {
+        System.out.println(SimpleCrypt.decrypt("{47lTrd4q+nFadVMTESULhV5bw45rWsOt5QMMrMYRzCqw2/v6F//dkA==}"));
     }
 
 }
