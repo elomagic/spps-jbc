@@ -103,7 +103,7 @@ public class SimpleCrypt {
                 key = new SecretKeySpec(result, ALGORITHM);
             } else {
                 KeyGenerator kg = KeyGenerator.getInstance(ALGORITHM);
-                kg.init(128);
+                kg.init(256);
                 key = kg.generateKey();
 
                 result = key.getEncoded();
