@@ -99,7 +99,6 @@ public class SimpleCrypt {
                     return new SecretKeySpec(result, ALGORITHM);
                 }
             }
-
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
             throw new IllegalStateException("Unable to read master key", ex);
@@ -127,9 +126,6 @@ public class SimpleCrypt {
                 Files.createDirectories(MASTER_KEY_FILE.getParent());
             }
 
-            byte[] result;
-            SecretKey key;
-
             if (Files.exists(MASTER_KEY_FILE) && !force) {
                 throw new FileAlreadyExistsException("Master key file \"" + MASTER_KEY_FILE+ "\" already exists. Use parameter \"-Force\" to overwrite it.");
             }
@@ -139,9 +135,9 @@ public class SimpleCrypt {
             if (relocationFile == null || file.equals(relocationFile)) {
                 KeyGenerator kg = KeyGenerator.getInstance(ALGORITHM);
                 kg.init(256);
-                key = kg.generateKey();
+                SecretKey key = kg.generateKey();
 
-                result = key.getEncoded();
+                byte[] result = key.getEncoded();
 
                 String base64 = Base64.toBase64String(result);
 
