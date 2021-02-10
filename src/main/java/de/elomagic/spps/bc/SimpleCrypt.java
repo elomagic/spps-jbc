@@ -108,11 +108,17 @@ public class SimpleCrypt {
         }
     }
 
+    /**
+     * Creates a new master key.
+     *
+     * @param force Must true to confirm to overwrite existing master key.
+     * @throws GeneralSecurityException Thrown when unable to create master key
+     */
     public static void createMasterKey(boolean force) throws GeneralSecurityException {
         createMasterKey(MASTER_KEY_FILE, force);
     }
 
-    public static void createMasterKey(@NotNull Path file, boolean force) throws GeneralSecurityException {
+    private static void createMasterKey(@NotNull Path file, boolean force) throws GeneralSecurityException {
         if (MASTER_KEY_FILE.equals(file)) {
             createMasterKey(file, null, force);
         } else {
@@ -120,7 +126,7 @@ public class SimpleCrypt {
         }
     }
 
-    public static void createMasterKey(@NotNull Path file, @Nullable Path relocationFile, boolean force) throws GeneralSecurityException {
+    private static void createMasterKey(@NotNull Path file, @Nullable Path relocationFile, boolean force) throws GeneralSecurityException {
         try {
             if (!MASTER_KEY_FILE.getParent().toFile().exists()) {
                 Files.createDirectories(MASTER_KEY_FILE.getParent());
