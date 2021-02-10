@@ -52,10 +52,12 @@ import java.util.Properties;
  */
 public class SimpleCrypt {
 
+    private static final Logger LOGGER = LogManager.getLogger(SimpleCrypt.class);
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
-    private static final Logger LOGGER = LogManager.getLogger(SimpleCrypt.class);
     private static final String MASTER_KEY_FILENAME = "masterkey";
+    private static final String KEY_KEY = "key";
+    private static final String RELOCATION_KEY = "relocation";
     private static final Path MASTER_KEY_FILE = Paths.get(System.getProperty("user.home"), ".spps", MASTER_KEY_FILENAME);
 
     private SimpleCrypt() {
@@ -90,10 +92,10 @@ public class SimpleCrypt {
             try (Reader reader = Files.newBufferedReader(file)) {
                 p.load(reader);
 
-                if (p.getProperty("relocation", "").trim().length() != 0) {
-                    return readMasterKey(Paths.get(p.getProperty("relocation")));
+                if (p.getProperty(RELOCATION_KEY, "").trim().length() != 0) {
+                    return readMasterKey(Paths.get(p.getProperty(RELOCATION_KEY)));
                 } else {
-                    byte[] result = Base64.decode(p.getProperty("key"));
+                    byte[] result = Base64.decode(p.getProperty(KEY_KEY));
                     return new SecretKeySpec(result, ALGORITHM);
                 }
             }
@@ -144,11 +146,11 @@ public class SimpleCrypt {
                 String base64 = Base64.toBase64String(result);
 
 
-                p.put("key", base64);
-                p.put("relocation", "");
+                p.put(KEY_KEY, base64);
+                p.put(RELOCATION_KEY, "");
             } else {
-                p.put("key", "");
-                p.put("relocation", relocationFile.toString());
+                p.put(KEY_KEY, "");
+                p.put(RELOCATION_KEY, relocationFile.toString());
                 createMasterKey(relocationFile, null, force);
             }
 
