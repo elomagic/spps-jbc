@@ -33,27 +33,33 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.security.GeneralSecurityException;
 import java.security.Key;
-import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.Properties;
 
 /**
  * Simple crypt tool class by using BouncyCastle framework.
  */
 public class SimpleCrypt {
 
+    private static final Logger LOGGER = LogManager.getLogger(SimpleCrypt.class);
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
-    private static final Logger LOGGER = LogManager.getLogger(SimpleCrypt.class);
-    private static final Path MASTER_KEY_FILE = Paths.get(System.getProperty("user.home"), ".spps", "masterkey");
+    private static final String MASTER_KEY_FILENAME = "masterkey";
+    private static final String KEY_KEY = "key";
+    private static final String RELOCATION_KEY = "relocation";
+    private static final Path MASTER_KEY_FILE = Paths.get(System.getProperty("user.home"), ".spps", MASTER_KEY_FILENAME);
 
     private SimpleCrypt() {
     }
@@ -71,6 +77,98 @@ public class SimpleCrypt {
         return new IvParameterSpec(iv);
     }
 
+    @NotNull
+    private static Key readMasterKey() throws GeneralSecurityException {
+        return readMasterKey(MASTER_KEY_FILE);
+    }
+
+    @NotNull
+    private static Key readMasterKey(@NotNull Path file) throws GeneralSecurityException {
+        try {
+            if (Files.notExists(file)) {
+                throw new FileNotFoundException("Unable to find settings file. At first you have to create a master key.");
+            }
+
+            Properties p = new Properties();
+            try (Reader reader = Files.newBufferedReader(file)) {
+                p.load(reader);
+
+                if (p.getProperty(RELOCATION_KEY, "").trim().length() != 0) {
+                    return readMasterKey(Paths.get(p.getProperty(RELOCATION_KEY)));
+                } else {
+                    byte[] result = Base64.decode(p.getProperty(KEY_KEY));
+                    return new SecretKeySpec(result, ALGORITHM);
+                }
+            }
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+            throw new IllegalStateException("Unable to read master key", ex);
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+            throw new GeneralSecurityException("Unable to create or read master key.", ex);
+        }
+    }
+
+    /**
+     * Creates a new master key.
+     *
+     * @param force Must true to confirm to overwrite existing master key.
+     * @throws GeneralSecurityException Thrown when unable to create master key
+     */
+    public static void createMasterKey(boolean force) throws GeneralSecurityException {
+        createMasterKey(MASTER_KEY_FILE, force);
+    }
+
+    private static void createMasterKey(@NotNull Path file, boolean force) throws GeneralSecurityException {
+        if (MASTER_KEY_FILE.equals(file)) {
+            createMasterKey(file, null, force);
+        } else {
+            createMasterKey(MASTER_KEY_FILE, file, force);
+        }
+    }
+
+    private static void createMasterKey(@NotNull Path file, @Nullable Path relocationFile, boolean force) throws GeneralSecurityException {
+        try {
+            if (!MASTER_KEY_FILE.getParent().toFile().exists()) {
+                Files.createDirectories(MASTER_KEY_FILE.getParent());
+            }
+
+            if (Files.exists(file) && !force) {
+                throw new FileAlreadyExistsException("Master key file \"" + file+ "\" already exists. Use parameter \"-Force\" to overwrite it.");
+            }
+
+            Properties p = new Properties();
+
+            if (relocationFile == null || file.equals(relocationFile)) {
+                KeyGenerator kg = KeyGenerator.getInstance(ALGORITHM);
+                kg.init(256);
+                SecretKey key = kg.generateKey();
+
+                byte[] result = key.getEncoded();
+
+                String base64 = Base64.toBase64String(result);
+
+
+                p.put(KEY_KEY, base64);
+                p.put(RELOCATION_KEY, "");
+            } else {
+                p.put(KEY_KEY, "");
+                p.put(RELOCATION_KEY, relocationFile.toString());
+                createMasterKey(relocationFile, null, force);
+            }
+
+            try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
+                p.store(writer, "SPPS Settings");
+            }
+        } catch (IOException ex) {
+            LOGGER.error(ex.getMessage(), ex);
+            throw new IllegalStateException("Unable to create master key", ex);
+        } catch (Exception ex) {
+            LOGGER.error(ex.getMessage(), ex);
+            throw new GeneralSecurityException("Unable to create or read master key.", ex);
+        }
+    }
+
     /**
      * Creates a cipher.
      *
@@ -81,49 +179,9 @@ public class SimpleCrypt {
     @NotNull
     private static Cipher createCypher(int opmode, @NotNull IvParameterSpec iv) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION, new BouncyCastleProvider());
-        cipher.init(opmode, getMasterKey(), iv);
+        cipher.init(opmode, readMasterKey(), iv);
 
         return cipher;
-    }
-
-    @NotNull
-    private static Key getMasterKey() throws GeneralSecurityException {
-        try {
-            if (!MASTER_KEY_FILE.getParent().toFile().exists()) {
-                Files.createDirectories(MASTER_KEY_FILE.getParent());
-            }
-
-            byte[] result;
-            SecretKey key;
-
-            if (Files.exists(MASTER_KEY_FILE)) {
-                byte[] base64 = Files.readAllBytes(MASTER_KEY_FILE);
-                result = Base64.decode(base64);
-
-                key = new SecretKeySpec(result, ALGORITHM);
-            } else {
-                KeyGenerator kg = KeyGenerator.getInstance(ALGORITHM);
-                kg.init(256);
-                key = kg.generateKey();
-
-                result = key.getEncoded();
-
-                String base64 = Base64.toBase64String(result);
-
-                Files.write(MASTER_KEY_FILE, Collections.singleton(base64), StandardOpenOption.CREATE_NEW);
-            }
-
-            return key;
-        } catch (IOException ex) {
-            LOGGER.error(ex.getMessage(), ex);
-            throw new IllegalStateException("Unable to read master key", ex);
-        } catch (NoSuchAlgorithmException ex) {
-            LOGGER.error(ex.getMessage(), ex);
-            throw new IllegalStateException("Unable to acquire AES algorithm. This is required to function.", ex);
-        } catch (Exception ex) {
-            LOGGER.error(ex.getMessage(), ex);
-            throw new GeneralSecurityException("Unable to create or read master key.", ex);
-        }
     }
 
     /**
@@ -255,9 +313,16 @@ public class SimpleCrypt {
                 return;
             }
 
-            String s = encrypt(args[0]);
-
-            LOGGER.info("Encrypted value: {}", s);
+            if (Arrays.binarySearch(args, "-Secret") != -1) {
+                int i = Arrays.binarySearch(args, "-Secret");
+                byte[] secret = args[i+1].getBytes(StandardCharsets.UTF_8);
+                System.out.println(encrypt(secret));
+            } else if (Arrays.binarySearch(args, "-CreateMasterKey") != -1) {
+                boolean force = Arrays.binarySearch(args, "-Force") != -1;
+                int i = Arrays.binarySearch(args, "-Relocation");
+                String relocation = i == -1 ? "" : args[i+1];
+                createMasterKey(force);
+            }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
         }

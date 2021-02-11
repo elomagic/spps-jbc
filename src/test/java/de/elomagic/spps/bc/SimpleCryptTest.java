@@ -1,13 +1,58 @@
 package de.elomagic.spps.bc;
 
+import org.apache.commons.io.FileUtils;
 import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
+import java.io.Reader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.Properties;
 
 class SimpleCryptTest {
+
+    private static final String MASTER_KEY_FILENAME = "masterkey";
+    private static final Path MASTER_KEY_FILE = Paths.get(System.getProperty("user.home"), ".spps", MASTER_KEY_FILENAME);
+
+    private static String backup;
+
+    @BeforeAll
+    static void beforeAll() throws Exception {
+        if (Files.exists(MASTER_KEY_FILE)) {
+            backup = FileUtils.readFileToString(MASTER_KEY_FILE.toFile(), StandardCharsets.UTF_8);
+        }
+
+        Files.deleteIfExists(MASTER_KEY_FILE);
+    }
+
+    @AfterAll
+    static void afterAll() throws Exception {
+        Files.deleteIfExists(MASTER_KEY_FILE);
+
+        if (backup != null) {
+            FileUtils.write(MASTER_KEY_FILE.toFile(), backup, StandardCharsets.UTF_8);
+        }
+    }
+
+    @Test
+    void testCreateMasterKey() throws Exception {
+        Assertions.assertTrue(Files.notExists(MASTER_KEY_FILE));
+
+        SimpleCrypt.createMasterKey(true);
+
+        Properties p = new Properties();
+        try (Reader reader = Files.newBufferedReader(MASTER_KEY_FILE)) {
+            p.load(reader);
+        }
+
+        Assertions.assertEquals(2, p.keySet().size());
+    }
 
     @Test
     void testEncryptDecryptWithString() throws Exception {
