@@ -45,6 +45,7 @@ import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Properties;
 
 /**
@@ -312,9 +313,16 @@ public class SimpleCrypt {
                 return;
             }
 
-            String s = encrypt(args[0]);
-
-            LOGGER.info("Encrypted value: {}", s);
+            if (Arrays.binarySearch(args, "-Secret") != -1) {
+                int i = Arrays.binarySearch(args, "-Secret");
+                byte[] secret = args[i+1].getBytes(StandardCharsets.UTF_8);
+                System.out.println(encrypt(secret));
+            } else if (Arrays.binarySearch(args, "-CreateMasterKey") != -1) {
+                boolean force = Arrays.binarySearch(args, "-Force") != -1;
+                int i = Arrays.binarySearch(args, "-Relocation");
+                String relocation = i == -1 ? "" : args[i+1];
+                createMasterKey(force);
+            }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
         }
