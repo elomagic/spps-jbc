@@ -84,7 +84,7 @@ public class SimpleCrypt {
     @NotNull
     private static Key readMasterKey(@NotNull Path file) throws GeneralSecurityException {
         try {
-            if (Files.notExists(MASTER_KEY_FILE)) {
+            if (Files.notExists(file)) {
                 throw new FileNotFoundException("Unable to find settings file. At first you have to create a master key.");
             }
 
@@ -132,8 +132,8 @@ public class SimpleCrypt {
                 Files.createDirectories(MASTER_KEY_FILE.getParent());
             }
 
-            if (Files.exists(MASTER_KEY_FILE) && !force) {
-                throw new FileAlreadyExistsException("Master key file \"" + MASTER_KEY_FILE+ "\" already exists. Use parameter \"-Force\" to overwrite it.");
+            if (Files.exists(file) && !force) {
+                throw new FileAlreadyExistsException("Master key file \"" + file+ "\" already exists. Use parameter \"-Force\" to overwrite it.");
             }
 
             Properties p = new Properties();
