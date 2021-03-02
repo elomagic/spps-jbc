@@ -56,10 +56,10 @@ public class SimpleCrypt {
     private static final Logger LOGGER = LogManager.getLogger(SimpleCrypt.class);
     private static final String ALGORITHM = "AES";
     private static final String TRANSFORMATION = "AES/GCM/NoPadding";
-    private static final String MASTER_KEY_FILENAME = "masterkey";
+    private static final String PRIVATE_KEY_FILENAME = "settings";
     private static final String KEY_KEY = "key";
     private static final String RELOCATION_KEY = "relocation";
-    private static final Path MASTER_KEY_FILE = Paths.get(System.getProperty("user.home"), ".spps", MASTER_KEY_FILENAME);
+    private static final Path PRIVATE_KEY_FILE = Paths.get(System.getProperty("user.home"), ".spps", PRIVATE_KEY_FILENAME);
 
     private SimpleCrypt() {
     }
@@ -77,16 +77,29 @@ public class SimpleCrypt {
         return new IvParameterSpec(iv);
     }
 
+    /**
+     * Read private key from default location.
+     *
+     * @return Returns the private key.
+     * @throws GeneralSecurityException Thrown when unable to create private key
+     */
     @NotNull
-    private static Key readMasterKey() throws GeneralSecurityException {
-        return readMasterKey(MASTER_KEY_FILE);
+    private static Key readPrivateKey() throws GeneralSecurityException {
+        return readPrivateKey(PRIVATE_KEY_FILE);
     }
 
+    /**
+     * Read a private key.
+     *
+     * @param file File of the private key. When relocation in file is set then key will be read from there.
+     * @return Returns the private key.
+     * @throws GeneralSecurityException Thrown when unable to create private key
+     */
     @NotNull
-    private static Key readMasterKey(@NotNull Path file) throws GeneralSecurityException {
+    private static Key readPrivateKey(@NotNull Path file) throws GeneralSecurityException {
         try {
             if (Files.notExists(file)) {
-                throw new FileNotFoundException("Unable to find settings file. At first you have to create a master key.");
+                throw new FileNotFoundException("Unable to find settings file. At first you have to create a private key.");
             }
 
             Properties p = new Properties();
@@ -94,7 +107,7 @@ public class SimpleCrypt {
                 p.load(reader);
 
                 if (p.getProperty(RELOCATION_KEY, "").trim().length() != 0) {
-                    return readMasterKey(Paths.get(p.getProperty(RELOCATION_KEY)));
+                    return readPrivateKey(Paths.get(p.getProperty(RELOCATION_KEY)));
                 } else {
                     byte[] result = Base64.decode(p.getProperty(KEY_KEY));
                     return new SecretKeySpec(result, ALGORITHM);
@@ -102,39 +115,54 @@ public class SimpleCrypt {
             }
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
-            throw new IllegalStateException("Unable to read master key", ex);
+            throw new IllegalStateException("Unable to read private key", ex);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
-            throw new GeneralSecurityException("Unable to create or read master key.", ex);
+            throw new GeneralSecurityException("Unable to create or read private key.", ex);
         }
     }
 
     /**
-     * Creates a new master key.
+     * Creates a new private key.
      *
-     * @param force Must true to confirm to overwrite existing master key.
-     * @throws GeneralSecurityException Thrown when unable to create master key
+     * @param force Must true to confirm to overwrite existing private key.
+     * @throws GeneralSecurityException Thrown when unable to create private key
      */
-    public static void createMasterKey(boolean force) throws GeneralSecurityException {
-        createMasterKey(MASTER_KEY_FILE, force);
+    public static void createPrivateKey(boolean force) throws GeneralSecurityException {
+        createPrivateKey(PRIVATE_KEY_FILE, force);
     }
 
-    private static void createMasterKey(@NotNull Path file, boolean force) throws GeneralSecurityException {
-        if (MASTER_KEY_FILE.equals(file)) {
-            createMasterKey(file, null, force);
+    /**
+     * Creates a private key file.
+     *
+     * @param file (Alternative) file where to write file with private key
+     * @param force When true and private key file already exists then it will be overwritten otherwise an exception will be thrown
+     * @throws GeneralSecurityException Thrown when unable to create private key
+     */
+    private static void createPrivateKey(@NotNull Path file, boolean force) throws GeneralSecurityException {
+        if (PRIVATE_KEY_FILE.equals(file)) {
+            createPrivateKey(file, null, force);
         } else {
-            createMasterKey(MASTER_KEY_FILE, file, force);
+            createPrivateKey(PRIVATE_KEY_FILE, file, force);
         }
     }
 
-    private static void createMasterKey(@NotNull Path file, @Nullable Path relocationFile, boolean force) throws GeneralSecurityException {
+    /**
+     * Creates a private key file.
+     *
+     * @param file Private key file
+     * @param relocationFile Alternative file where to write file with private key
+     * @param force When true and private key file already exists then it will be overwritten otherwise an exception will be thrown
+     * @throws GeneralSecurityException Thrown when unable to create private key
+     */
+    private static void createPrivateKey(@NotNull Path file, @Nullable Path relocationFile, boolean force) throws GeneralSecurityException {
         try {
-            if (!MASTER_KEY_FILE.getParent().toFile().exists()) {
-                Files.createDirectories(MASTER_KEY_FILE.getParent());
+            if (!PRIVATE_KEY_FILE.getParent().toFile().exists()) {
+                Files.createDirectories(PRIVATE_KEY_FILE.getParent());
             }
 
             if (Files.exists(file) && !force) {
-                throw new FileAlreadyExistsException("Master key file \"" + file+ "\" already exists. Use parameter \"-Force\" to overwrite it.");
+                throw new FileAlreadyExistsException("Private key file \"" + file+ "\" already exists. Use parameter \"-Force\" to overwrite it.");
             }
 
             Properties p = new Properties();
@@ -154,7 +182,7 @@ public class SimpleCrypt {
             } else {
                 p.put(KEY_KEY, "");
                 p.put(RELOCATION_KEY, relocationFile.toString());
-                createMasterKey(relocationFile, null, force);
+                createPrivateKey(relocationFile, null, force);
             }
 
             try (Writer writer = Files.newBufferedWriter(file, StandardCharsets.UTF_8)) {
@@ -162,10 +190,10 @@ public class SimpleCrypt {
             }
         } catch (IOException ex) {
             LOGGER.error(ex.getMessage(), ex);
-            throw new IllegalStateException("Unable to create master key", ex);
+            throw new IllegalStateException("Unable to create private key", ex);
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
-            throw new GeneralSecurityException("Unable to create or read master key.", ex);
+            throw new GeneralSecurityException("Unable to create or read private key.", ex);
         }
     }
 
@@ -179,7 +207,7 @@ public class SimpleCrypt {
     @NotNull
     private static Cipher createCypher(int opmode, @NotNull IvParameterSpec iv) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance(TRANSFORMATION, new BouncyCastleProvider());
-        cipher.init(opmode, readMasterKey(), iv);
+        cipher.init(opmode, readPrivateKey(), iv);
 
         return cipher;
     }
@@ -317,11 +345,16 @@ public class SimpleCrypt {
                 int i = Arrays.binarySearch(args, "-Secret");
                 byte[] secret = args[i+1].getBytes(StandardCharsets.UTF_8);
                 System.out.println(encrypt(secret));
-            } else if (Arrays.binarySearch(args, "-CreateMasterKey") != -1) {
+            } else if (Arrays.binarySearch(args, "-CreatePrivateKey") != -1) {
                 boolean force = Arrays.binarySearch(args, "-Force") != -1;
                 int i = Arrays.binarySearch(args, "-Relocation");
-                String relocation = i == -1 ? "" : args[i+1];
-                createMasterKey(force);
+                Path relocation = i == -1 ? null : Paths.get(args[i+1]);
+                if (relocation == null) {
+                    createPrivateKey(force);
+                } else {
+                    createPrivateKey(relocation, force);
+                }
+
             }
         } catch (Exception ex) {
             LOGGER.error(ex.getMessage(), ex);
