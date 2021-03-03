@@ -98,9 +98,10 @@ class SimpleCryptTest {
     }
 
     @Test
-    void testMain() {
-        Assertions.assertDoesNotThrow(() -> SimpleCrypt.main(new String[] {"abcde"}));
-        Assertions.assertDoesNotThrow(() -> SimpleCrypt.main(null));
+    void testRun() {
+        Assertions.assertEquals(0, SimpleCrypt.run(new String[] {"abcde"}));
+        Assertions.assertEquals(0, SimpleCrypt.run(null));
+        Assertions.assertEquals(1, SimpleCrypt.run(new String[] {"-Secret"}));
     }
 
     @Test

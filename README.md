@@ -59,7 +59,7 @@ class Sample {
 Enter following command in your terminal:
 
 ```bash  
-java -jar spps-jbs-1.0.0.jar -CreatePrivateKey
+java -jar spps-jbc-1.0.0.jar -CreatePrivateKey
 ```
 
 The settings file ```'~/.spps/settings'``` in your home folder will look like:
@@ -74,7 +74,7 @@ relocation=
 Enter following command in your terminal:
 
 ```bash
-java -jar spps-jbs-1.0.0.jar -CreatePrivateKey -Relocation /Volumes/usb-stick
+java -jar spps-jbc-1.0.0.jar -CreatePrivateKey -Relocation /Volumes/usb-stick
 ```
 
 The settings file ```'~/.spps/settings'``` in your home folder will look like:
@@ -96,7 +96,7 @@ relocation=
 Enter following command in your terminal:
 
 ```bash 
-java -jar spps-jbs-1.0.0.jar -Secret YourSecret 
+java -jar spps-jbc-1.0.0.jar -Secret YourSecret 
 ```
 
 Output should look like:

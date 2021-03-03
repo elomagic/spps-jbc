@@ -1,0 +1,25 @@
+Usage: java -jar spps-jbc-x.x.x.jar [-Force] [-Relocation <path>] | -Secret <secret>
+
+More SPPS online help on https://github.com/elomagic/spps-jbc
+
+-Relocation <path>
+    Use this parameters to persist the private key at another location instead
+    of the default '.sbbs' folder of the current users home.
+
+-Force
+    Use this parameter in case when a private key file already exists. With this
+    parameter you agree to overwrite it.
+
+-Secret <secret>
+    Creates and print an encrypted.
+
+-Help
+    Prints this help
+
+
+Sample create private key
+    java -jar spps-jbc-1.0.0.jar -CreatePrivateKey
+
+
+Sample create encrypted password
+    java -jar spps-jbc-1.0.0.jar -Secret YourSecret
