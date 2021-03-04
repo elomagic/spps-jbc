@@ -57,6 +57,7 @@ public class SimpleCrypt {
     private static final String PRIVATE_KEY_FILENAME = "settings";
     private static final String KEY_KEY = "key";
     private static final String RELOCATION_KEY = "relocation";
+    private static final int PRIVATE_KEY_SIZE = 256;
     private static final Path PRIVATE_KEY_FILE = Paths.get(System.getProperty("user.home"), ".spps", PRIVATE_KEY_FILENAME);
 
     private SimpleCrypt() {
@@ -70,7 +71,7 @@ public class SimpleCrypt {
     @NotNull
     private static IvParameterSpec createInitializationVector() {
         SecureRandom random = new SecureRandom();
-        byte[] iv = new byte[16];
+        byte[] iv = new byte[PRIVATE_KEY_SIZE / 16];
         random.nextBytes(iv);
         return new IvParameterSpec(iv);
     }
@@ -167,7 +168,7 @@ public class SimpleCrypt {
 
             if (relocationFile == null || file.equals(relocationFile)) {
                 KeyGenerator kg = KeyGenerator.getInstance(ALGORITHM);
-                kg.init(256);
+                kg.init(PRIVATE_KEY_SIZE);
                 SecretKey key = kg.generateKey();
 
                 byte[] result = key.getEncoded();
