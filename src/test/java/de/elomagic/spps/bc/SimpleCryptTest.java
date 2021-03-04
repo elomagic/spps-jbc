@@ -119,4 +119,30 @@ class SimpleCryptTest {
         Assertions.assertTrue(ex.getMessage().contains("This value is not with curly brackets"));
     }
 
+    @Test
+    void testSetSettingsFile() throws Exception {
+
+        Path tempFolder = Files.createTempDirectory("tmpDirPrefix");
+        Files.createDirectories(tempFolder);
+
+        Path settingsFile =  tempFolder.resolve("alternativeSettings");
+        Assertions.assertTrue(Files.notExists(settingsFile));
+
+        String value = "secretäöüß";
+        SimpleCrypt.createPrivateKey(true);
+        String encrypted1 = SimpleCrypt.encrypt(value);
+        Assertions.assertTrue(SimpleCrypt.isEncryptedValue(encrypted1));
+        Assertions.assertEquals(value, SimpleCrypt.decryptToString(encrypted1));
+
+        SimpleCrypt.setSettingsFile(settingsFile);
+        Assertions.assertThrows(GeneralSecurityException.class, () -> SimpleCrypt.decrypt(encrypted1));
+
+        SimpleCrypt.createPrivateKey(true);
+        Assertions.assertTrue(Files.exists(settingsFile));
+
+        String encrypted2 = SimpleCrypt.encrypt(value);
+        SimpleCrypt.setSettingsFile(null);
+        Assertions.assertThrows(GeneralSecurityException.class, () -> SimpleCrypt.decrypt(encrypted2));
+    }
+
 }
