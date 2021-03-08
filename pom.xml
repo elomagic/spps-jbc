@@ -5,7 +5,7 @@
 
     <groupId>de.elomagic</groupId>
     <artifactId>spps-jbc</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Simple Password Protection Solution with Bouncy Castle</name>
@@ -55,7 +55,7 @@
         <url>https://github.com/elomagic/spps-jbc</url>
         <connection>scm:git:git@github.com/elomagic/spps-jbc.git</connection>
         <developerConnection>scm:git:git@github.com/elomagic/spps-jbc.git</developerConnection>
-        <tag>v1.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <dependencies>
