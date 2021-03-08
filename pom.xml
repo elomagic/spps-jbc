@@ -5,11 +5,12 @@
 
     <groupId>de.elomagic</groupId>
     <artifactId>spps-jbc</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Simple Password Protection Solution with Bouncy Castle</name>
     <description>Simple Password Protection Solution for Java with Bouncy Castle</description>
+    <url>https://github.com/elomagic/spps-jbc</url>
 
     <licenses>
         <license>
