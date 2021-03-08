@@ -213,6 +213,9 @@
                                 <goals>
                                     <goal>jar</goal>
                                 </goals>
+                                <configuration>
+                                    <javadocExecutable>${java.home}/bin</javadocExecutable>
+                                </configuration>
                             </execution>
                         </executions>
                     </plugin>
