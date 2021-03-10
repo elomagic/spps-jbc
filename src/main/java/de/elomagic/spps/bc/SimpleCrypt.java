@@ -333,10 +333,13 @@ public class SimpleCrypt {
     /**
      * Set an alternative default settings file instead of default "${user.home}/.spps/settings".
      *
-     * @param path Alternative settings file or null to use the default path.
+     * An application can use this feature to prevent sharing of the private key with other applications.
+     *
+     * @param file Alternative settings file or null to use the default file.
      */
-    public static void setSettingsFile(@Nullable Path path) {
-        SETTINGS_FILE.set(path == null ? DEFAULT_SETTINGS_FILE : path);
+    public static void setSettingsFile(@Nullable Path file) {
+        LOGGER.info("Changing default settings file to {}", SETTINGS_FILE.get());
+        SETTINGS_FILE.set(file == null ? DEFAULT_SETTINGS_FILE : file);
     }
 
     private static PrintWriter out() {
