@@ -4,6 +4,7 @@ Simple Password Protection Solution for Java with Bouncy Castle
 
 ---
 
+[![GitHub tag](https://img.shields.io/github/tag/elomagic/spps-jbc.svg)](https://GitHub.com/elomagic/spps-jbc/tags/)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Build Status](https://img.shields.io/travis/com/elomagic/spps-jbc)](https://travis-ci.com/github/elomagic/spps-jbc)
 [![Coverage Status](https://coveralls.io/repos/github/elomagic/spps-jbc/badge.svg)](https://coveralls.io/github/elomagic/spps-jbc)
