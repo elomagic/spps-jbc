@@ -132,6 +132,9 @@ Output should look like:
 
 *Supported since version 1.1.0*
 
+The method ```SimpleCrypt.setSettingsFile([file])``` can be used to set application wide an alternative settings file instead of "/.spps/settings" in the 
+users home folder.
+
 ```java
 import de.elomagic.spps.bc.SimpleCrypt;
 
