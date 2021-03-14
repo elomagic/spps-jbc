@@ -44,6 +44,8 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -347,26 +349,26 @@ public class SimpleCrypt {
         return System.console() == null ? new PrintWriter(System.out, true) : System.console().writer();
     }
 
-    private static String getArgument(@Nullable String[] args, int index) {
-        if (args == null || args.length <= index) {
+    static String getArgument(@NotNull List<String> args, @NotNull String option) {
+        int index = args.indexOf(option);
+
+        if (index == -1 || args.size() <= index+1) {
             throw new IllegalArgumentException("Syntax error. Argument not found.");
         }
 
-        return args[index];
+        return args.get(index+1);
     }
 
     static int run(@Nullable String[] args) {
         try {
-            args = args == null ? new String[0] : args;
+            List<String> argList = args == null ? Collections.emptyList() : Arrays.asList(args);
 
-            if (Arrays.binarySearch(args, "-Secret") != -1) {
-                int i = Arrays.binarySearch(args, "-Secret");
-                byte[] secret = getArgument(args, i+1).getBytes(StandardCharsets.UTF_8);
+            if (argList.contains("-Secret")) {
+                byte[] secret = getArgument(argList, "-Secret").getBytes(StandardCharsets.UTF_8);
                 out().println(encrypt(secret));
-            } else if (Arrays.binarySearch(args, "-CreatePrivateKey") != -1) {
-                boolean force = Arrays.binarySearch(args, "-Force") != -1;
-                int i = Arrays.binarySearch(args, "-Relocation");
-                Path relocation = i == -1 ? null : Paths.get(getArgument(args, i+1));
+            } else if (argList.contains("-CreatePrivateKey")) {
+                boolean force = argList.contains("-Force");
+                Path relocation = argList.contains("-Relocation") ? Paths.get(getArgument(argList, "-Relocation")) : null;
                 if (relocation == null) {
                     createPrivateKey(force);
                 } else {

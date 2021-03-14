@@ -13,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.GeneralSecurityException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Properties;
 
 class SimpleCryptTest {
@@ -143,6 +145,14 @@ class SimpleCryptTest {
         String encrypted2 = SimpleCrypt.encrypt(value);
         SimpleCrypt.setSettingsFile(null);
         Assertions.assertThrows(GeneralSecurityException.class, () -> SimpleCrypt.decrypt(encrypted2));
+    }
+
+    @Test
+    void testGetArgument() {
+        Assertions.assertThrows(IllegalArgumentException.class, () -> SimpleCrypt.getArgument(Collections.emptyList(), null));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> SimpleCrypt.getArgument(Collections.emptyList(), "test"));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> SimpleCrypt.getArgument(Arrays.asList("test"), "test"));
+        Assertions.assertEquals("value", SimpleCrypt.getArgument(Arrays.asList("test", "value"), "test"));
     }
 
 }
