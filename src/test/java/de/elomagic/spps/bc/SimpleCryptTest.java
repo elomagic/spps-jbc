@@ -145,8 +145,10 @@ class SimpleCryptTest {
 
     @Test
     void testDecrypt1() {
-        Exception ex = Assertions.assertThrows(SimpleCryptException.class, ()->SimpleCrypt.decrypt("this isn't a encapsulated value"));
-        Assertions.assertTrue(ex.getMessage().contains("This value is not with curly brackets"));
+        Assertions.assertEquals("NOT_NULL", SimpleCrypt.decryptToString("NOT_NULL"));
+        Assertions.assertEquals("", SimpleCrypt.decryptToString(""));
+        Assertions.assertNull(SimpleCrypt.decrypt(null));
+        Assertions.assertThrows(SimpleCryptException.class, ()->SimpleCrypt.decrypt("{fake}"));
     }
 
     @Test

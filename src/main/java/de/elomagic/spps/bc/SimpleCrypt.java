@@ -51,7 +51,7 @@ import java.util.concurrent.atomic.AtomicReference;
 /**
  * Simple crypt tool class by using BouncyCastle framework.
  */
-public class SimpleCrypt {
+public final class SimpleCrypt {
 
     private static final Logger LOGGER = LogManager.getLogger(SimpleCrypt.class);
     private static final String ALGORITHM = "AES";
@@ -287,12 +287,8 @@ public class SimpleCrypt {
      */
     @Nullable
     public static byte[] decrypt(@Nullable String encryptedBase64) throws SimpleCryptException {
-        if (encryptedBase64 == null) {
-            return null;
-        }
-
         if(!isEncryptedValue(encryptedBase64)) {
-            throw new SimpleCryptException("This value is not with curly brackets encapsulated as an encrypted value. Unable to decrypt.");
+            return encryptedBase64 == null ? null : encryptedBase64.getBytes(StandardCharsets.UTF_8);
         }
 
         try {
