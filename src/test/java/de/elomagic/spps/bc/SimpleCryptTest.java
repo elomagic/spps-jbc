@@ -5,6 +5,7 @@ import org.bouncycastle.pqc.math.linearalgebra.ByteUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayNameGenerator;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -52,6 +53,21 @@ class SimpleCryptTest {
     }
 
     @Test
+    void testInit() throws Exception {
+        Path file = createEmptyTempFile();
+        SimpleCrypt.setSettingsFile(file);
+        Files.deleteIfExists(file);
+
+        Assertions.assertFalse(SimpleCrypt.isInitialize());
+
+        Assertions.assertTrue(SimpleCrypt.init());
+
+        Assertions.assertTrue(SimpleCrypt.isInitialize());
+
+        Assertions.assertFalse(SimpleCrypt.init());
+    }
+
+    @Test
     void testCreatePrivateKey() throws Exception {
         Path file = createEmptyTempFile();
 
@@ -88,7 +104,7 @@ class SimpleCryptTest {
         String e2 = SimpleCrypt.encrypt(value);
         Assertions.assertNotEquals(e1, e2);
 
-        Assertions.assertThrows(GeneralSecurityException.class, () -> SimpleCrypt.decryptToString("{bullshit}"));
+        Assertions.assertThrows(SimpleCryptException.class, () -> SimpleCrypt.decryptToString("{bullshit}"));
     }
 
     @Test
@@ -129,7 +145,7 @@ class SimpleCryptTest {
 
     @Test
     void testDecrypt1() {
-        Exception ex = Assertions.assertThrows(GeneralSecurityException.class, ()->SimpleCrypt.decrypt("this isn't a encapsulated value"));
+        Exception ex = Assertions.assertThrows(SimpleCryptException.class, ()->SimpleCrypt.decrypt("this isn't a encapsulated value"));
         Assertions.assertTrue(ex.getMessage().contains("This value is not with curly brackets"));
     }
 
@@ -145,14 +161,14 @@ class SimpleCryptTest {
 
         Path file2 = createEmptyTempFile();
         SimpleCrypt.setSettingsFile(file2);
-        Assertions.assertThrows(GeneralSecurityException.class, () -> SimpleCrypt.decrypt(encrypted1));
+        Assertions.assertThrows(SimpleCryptException.class, () -> SimpleCrypt.decrypt(encrypted1));
 
         SimpleCrypt.createPrivateKey(file2, null,true);
         Assertions.assertTrue(Files.exists(file2));
 
         String encrypted2 = SimpleCrypt.encrypt(value);
         SimpleCrypt.setSettingsFile(null);
-        Assertions.assertThrows(GeneralSecurityException.class, () -> SimpleCrypt.decrypt(encrypted2));
+        Assertions.assertThrows(SimpleCryptException.class, () -> SimpleCrypt.decrypt(encrypted2));
     }
 
     @Test
