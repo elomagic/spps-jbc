@@ -1,5 +1,8 @@
 # Changelog
 
+## [1.1.2] - 2021-12-17
+* BUGFIX Log4shell issue fixed
+
 ## [1.1.1] - 2021-03-17
 
 * BUGFIX Possible NPE occur on empty arguments 
