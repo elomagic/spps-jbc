@@ -6,7 +6,7 @@
 * CHANGE Exception class GeneralSecurityException replaced by runtime exception SimpleCryptException
 * FEATURE Method "init()" added to create settings file if it doesn't exist. Recommend to call during application start.
 
-## [1.1.2] - 2021-12-17
+## [1.1.3] - 2021-12-18
 * BUGFIX Log4shell issue fixed
 
 ## [1.1.1] - 2021-03-17
