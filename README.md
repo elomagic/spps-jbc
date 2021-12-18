@@ -38,7 +38,7 @@ Add following dependency to your project
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/maven-v4_0_0.xsd">
 
     ...
 
@@ -46,7 +46,7 @@ Add following dependency to your project
         <dependency>
             <groupId>de.elomagic</groupId>
             <artifactId>spps-jbc</artifactId>
-            <version>1.1.0</version>
+            <version>1.1.2</version>
         </dependency>
     </dependencies>
     
@@ -84,7 +84,7 @@ class Sample {
 Enter following command in your terminal:
 
 ```bash  
-java -jar spps-jbc-1.0.0.jar -CreatePrivateKey
+java -jar spps-jbc-1.1.2.jar -CreatePrivateKey
 ```
 
 The settings file ```'~/.spps/settings'``` in your home folder will look like:
@@ -99,7 +99,7 @@ relocation=
 Enter following command in your terminal:
 
 ```bash
-java -jar spps-jbc-1.0.0.jar -CreatePrivateKey -Relocation /Volumes/usb-stick
+java -jar spps-jbc-1.1.2.jar -CreatePrivateKey -Relocation /Volumes/usb-stick
 ```
 
 The settings file ```'~/.spps/settings'``` in your home folder will look like:
@@ -121,7 +121,7 @@ relocation=
 Enter following command in your terminal:
 
 ```bash 
-java -jar spps-jbc-1.0.0.jar -Secret YourSecret 
+java -jar spps-jbc-1.1.2.jar -Secret YourSecret 
 ```
 
 Output should look like:
@@ -153,4 +153,15 @@ class Sample {
     }
 
 }
+```
+
+## Contribution
+
+### Releasing new version / hotfix (Only for users who have repository permissions)
+
+Steps for release a new version / hotfix
+
+```bash
+mvn clean install release:prepare -P release
+mvn release:perform -P release
 ```
