@@ -1,5 +1,9 @@
 # Changelog
 
+## [1.1.4] - Upcoming
+
+* BUGFIX Log4j updated
+
 ## [1.1.3] - 2021-12-18
 
 * Nothing changes to the previous.
