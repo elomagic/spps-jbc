@@ -154,3 +154,14 @@ class Sample {
 
 }
 ```
+
+## Contribution
+
+### Releasing new version / hotfix (Only for users who have repository permissions)
+
+Steps for release a new version / hotfix
+
+```bash
+mvn clean install release:prepare -P release
+mvn release:perform -P release
+```
