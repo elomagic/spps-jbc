@@ -1,6 +1,6 @@
 # Changelog
 
-## [1.2.0] - Upcoming
+## [1.2.0] - 2021-12-19
 
 * CHANGE Any decrypt method returns original value in case when given value is not surrounded by braces "{" and "}".
 * CHANGE Exception class GeneralSecurityException replaced by runtime exception SimpleCryptException
