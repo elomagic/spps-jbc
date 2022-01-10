@@ -15,7 +15,11 @@ The SPPS is a lightweight solution to protect / hide your password or anything e
 ## Features
 
 * AES 256 GCM en-/decryption
-* Cross programming languages support ([Java](https://github.com/elomagic/spps-jshiro), [Python](https://github.com/elomagic/spps-py), [Node.js](https://github.com/elomagic/spps-npm))
+* Cross programming languages support
+  * [Java with Bouncy Castle](https://github.com/elomagic/spps-jbc)
+  * [Java with Apache Shiro](https://github.com/elomagic/spps-jshiro)
+  * [Python](https://github.com/elomagic/spps-py),
+  * [Node.js](https://github.com/elomagic/spps-npm)
 
 ## Concept
 
