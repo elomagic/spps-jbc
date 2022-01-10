@@ -1,5 +1,9 @@
 # Changelog
 
+## [x.x.x] - Upcoming
+
+* BUGFIX Using log4j version 2.17.1
+
 ## [1.2.0] - 2021-12-19
 
 * CHANGE Any decrypt method returns original value in case when given value is not surrounded by braces "{" and "}".
