@@ -18,8 +18,9 @@ The SPPS is a lightweight solution to protect / hide your password or anything e
 * Cross programming languages support
   * [Java with Bouncy Castle](https://github.com/elomagic/spps-jbc)
   * [Java with Apache Shiro](https://github.com/elomagic/spps-jshiro)
-  * [Python](https://github.com/elomagic/spps-py),
+  * [Python](https://github.com/elomagic/spps-py)
   * [Node.js](https://github.com/elomagic/spps-npm)
+* Apache Tomee - DataSource password cipher support
 
 ## Concept
 
@@ -50,7 +51,7 @@ Add following dependency to your project
         <dependency>
             <groupId>de.elomagic</groupId>
             <artifactId>spps-jbc</artifactId>
-            <version>1.1.0</version>
+            <version>1.3.0</version>
         </dependency>
     </dependencies>
     
@@ -158,6 +159,47 @@ class Sample {
 
 }
 ```
+
+## Apache Tomee integration
+
+Note if your Tomee run with a different account then yours. In this case you have to encrypt your secret in context of 
+the account which will run the service in the future. One solution idea is to provide a webservice which will do this 
+job. 
+
+Set ```spps``` as password cipher and the encrypted secret in property ```password``` WITHOUT the surrounding brackets
+in the ```[tomme_inst_folder]\conf\tomee.xml``` file.
+
+For some unknown reason, Tomee removes the closing bracket from the encrypted SPPS secret when try to decrypt, so we 
+have to remove the brackets in the ```tomee.xml``` file.
+
+### Example resource in the tomee.xml
+```xml
+<Resource id="MySQL Database" type="DataSource">
+    #  MySQL example
+    #
+    #  This connector will not work until you download the driver at:
+    #  https://dev.mysql.com/downloads/connector/j/
+
+    JdbcDriver  com.mysql.jdbc.Driver
+    JdbcUrl jdbc:mysql://localhost/test
+    UserName    test
+
+    # Use "spps" as password cipher and remove the brackets from the encrypted password.
+    Password    1K2UqEGtaz1xktKScCvRLHmPjNe1tE51Clt+2prUn/nonA7yvF0bhw==
+    PasswordCipher spps
+</Resource>
+```
+
+For more information see https://tomee.apache.org/latest/docs/datasource-password-encryption.html or
+
+### Requirements
+
+Put all JAR file in latest version into the lib folder of your Tomee
+* spps-jbc-1.x.x.jar - https://github.com/elomagic/spps-jbc
+* bcprov-jdk15on-170.jar - https://www.bouncycastle.org/latest_releases.html
+* log4j-core-2.x.x.jar - https://logging.apache.org/log4j/2.x/download.html
+* log4j-api-2.x.x.jar - https://logging.apache.org/log4j/2.x/download.html
+* disruptor-3.x.x.jar - https://github.com/LMAX-Exchange/disruptor/releases
 
 ## Contribution
 

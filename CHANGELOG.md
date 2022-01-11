@@ -1,8 +1,9 @@
 # Changelog
 
-## [x.x.x] - Upcoming
+## [1.3.0] - Upcoming
 
 * BUGFIX Using log4j version 2.17.1
+* FEATURE Tomee Datasource Cipher provider support added
 
 ## [1.2.0] - 2021-12-19
 
