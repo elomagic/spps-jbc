@@ -162,6 +162,8 @@ class Sample {
 
 ## Apache Tomee integration
 
+*Supported since version 1.3.0*
+
 Note if your Tomee run with a different account then yours. In this case you have to encrypt your secret in context of 
 the account which will run the service in the future. One solution idea is to provide a webservice which will do this 
 job. 
